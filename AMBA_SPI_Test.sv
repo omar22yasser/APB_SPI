@@ -56,7 +56,7 @@ module tb_AMBA_SPI_Wrapper;
       @(posedge PCLK);
       @(posedge PCLK);
       PENABLE = 1; // ACCESS phase
-      @(negedge PCLK);
+      @(posedge PCLK);
       PSEL   = 0;
       PENABLE= 0;
       PWRITE = 0;
