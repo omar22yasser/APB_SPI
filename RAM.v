@@ -17,29 +17,31 @@ reg [ADDR_SIZE-1:0] addr;
 
 always@(posedge clk or negedge rst_n)
   begin
-    if(~rst_n)
+    if(~rst_n) begin
       dout <= 'b0;
-    else
+      tx_valid <= 'b0;
+      addr <= 'b0;
+    end
+    else if(rx_valid) begin //must wait for the rx_valid to be high in order to accept th operation
+      tx_valid <= 1'b0;
       case(din[9:8])
         wr_addr, rd_addr: begin
-          tx_valid <= 1'b0;
-          if(rx_valid) begin //must wait for the rx_valid to be high in order to accept the operation
-            addr <= din[7:0]; //holding din[7:0] as an address
-          end 
+        tx_valid <= 1'b0;
+        addr <= din[7:0]; //holding din[7:0] as an address
         end
 
         wr_data: begin
-          tx_valid <= 1'b0;
-          if(rx_valid) begin //must wait for the rx_valid to be high in order to accept the operation
-            memory[addr] <= din[7:0]; //Write din[7:0] in the memory with write address held previously
-          end
+        tx_valid <= 1'b0;
+        memory[addr] <= din[7:0];
         end
 
         rd_data: begin
-          dout <= memory[addr]; //dout holds the word read from the memory
-          tx_valid <= 1'b1;
+        dout <= memory[addr]; //dout holds the word read from the memory
+        tx_valid <= 1'b1;
         end
       endcase
+      end 
+
   end
 
 endmodule
